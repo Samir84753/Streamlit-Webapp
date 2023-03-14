@@ -3,7 +3,6 @@ import json
 from dotenv import load_dotenv
 load_dotenv()
 import os
-import pyperclip
 
 # Define the filename for the JSON file
 json_file = "blog_urls.json"
