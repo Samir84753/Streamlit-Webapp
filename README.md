@@ -1,2 +1,2 @@
 # Streamlit-Webapp
-https://samir84753-streamlit-webapp-app-b720ht.streamlit.app/
+https://samir-maharjan.streamlit.app/
