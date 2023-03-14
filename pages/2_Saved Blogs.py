@@ -129,8 +129,8 @@ def main():
     else:
         st.header("## Authenticate to add urls")
 
-    # download urls as json file
-    if st.sidebar.download_button('Download as Json File', str(blog_dict),"blog_urls.json"):
+   # download urls as json file
+    if st.sidebar.download_button('Download Blog URLs Json File', json.dumps(blog_dict).encode('utf-8'), "blog_urls.json"):
         st.sidebar.success("Downloaded successfully as a JSON file!")
 
     #view section
