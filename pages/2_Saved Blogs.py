@@ -75,15 +75,20 @@ def add_section():
             blog_dict[new_section] = {}
             st.sidebar.success(f"Created '{new_section}' section")
             save_to_json()
+
 def remove_section():
     """Deletes section from json.
     """
     st.sidebar.header("Delete Section")
-    blog_section=st.sidebar.selectbox("select section",list(blog_dict.keys()))
-    if st.sidebar.button("Delete Section"):
+    blog_section = st.sidebar.selectbox("Select section", list(blog_dict.keys()))
+    delete_section=st.sidebar.button("Delete Section")
+    confirm_delete = st.sidebar.checkbox("Confirm deletion of selected section")
+    if confirm_delete and delete_section:
         del blog_dict[blog_section]
-        st.sidebar.success(f"Deleted")
+        st.sidebar.success(f"{blog_section} section deleted")
         save_to_json()
+    elif delete_section:
+        st.sidebar.warning("Please confirm deletion")
 
 def search():
     """Searches for content on json file.
@@ -105,6 +110,15 @@ def search():
     return results
 
 def main():
+    st.set_page_config(
+    page_title="Saved Blog Manager",
+    page_icon="📖",
+    initial_sidebar_state="expanded",
+    menu_items={
+        'Report a bug': "https://github.com/Samir84753/Streamlit-Webapp/issues",
+        'About': "This is a web application made with Streamlit."
+    })
+
     st.title("# Saved Blog Manager")
 
     if user_auth():
@@ -114,9 +128,9 @@ def main():
         remove_section()
     else:
         st.header("## Authenticate to add urls")
-        
+
     # download urls as json file
-    if st.sidebar.download_button('Download file', str(blog_dict),"blog_urls.json"):
+    if st.sidebar.download_button('Download as Json File', str(blog_dict),"blog_urls.json"):
         st.sidebar.success("Downloaded successfully as a JSON file!")
 
     #view section
