@@ -6,7 +6,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
-        'Report a bug': "https://github.com/Samir84753/EcommerceWeb-project",
+        'Report a bug': "https://github.com/Samir84753/Streamlit-Webapp",
         'About': "# This is a header. This is an *extremely* cool app!"
     })
 st.title("APP")
