@@ -3,10 +3,17 @@ import json
 from dotenv import load_dotenv
 load_dotenv()
 import os
-
+import pyperclip
 
 # Define the filename for the JSON file
 json_file = "blog_urls.json"
+
+def download_json_file():
+    with open(json_file, 'r') as f:
+        data = json.load(f)
+    with open("downloaded.json", 'w') as f:
+        json.dump(data, f)
+    st.sidebar.success(f"{json_file} downloaded successfully as a JSON file!")
 
 # Load the blog URLs from the JSON file
 try:
@@ -114,7 +121,9 @@ def main():
         remove_section()
     else:
         st.header("## Authenticate to add urls")
-
+    if st.sidebar.button('Download JSON file'):
+        
+        download_json_file()
     #view section
     results = search()
     if results:
