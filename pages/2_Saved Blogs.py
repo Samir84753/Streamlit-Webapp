@@ -1,8 +1,10 @@
 import streamlit as st
 import json
 from dotenv import load_dotenv
-load_dotenv()
 import os
+
+load_dotenv()
+
 
 # Define the filename for the JSON file
 json_file = "blog_urls.json"
@@ -18,7 +20,8 @@ except FileNotFoundError:
 
 # Define the password
 
-password = os.environ.get('PASSWORD')
+password = os.environ.get("PASSWORD")
+
 
 # Define a function to check the user's password
 def user_auth():
@@ -27,46 +30,53 @@ def user_auth():
     Returns:
         bool: True if password matches. Else False.
     """
-    user_password = st.sidebar.text_input("Enter the password to add or delete blog URLs", type="password")
+    user_password = st.sidebar.text_input(
+        "Enter the password to add or delete blog URLs", type="password"
+    )
     if user_password == password:
         return True
     elif user_password != "":
         st.sidebar.warning("Incorrect password")
     return False
 
+
 # Define a function to save the blog URLs to the JSON file
 def save_to_json():
-    """Saves content to json file
-    """
+    """Saves content to json file"""
     with open(json_file, "w") as f:
         json.dump(blog_dict, f)
 
+
 def add_blog():
-    """Saves the user input of title,url, and section to json file.
-    """
+    """Saves the user input of title,url, and section to json file."""
     st.sidebar.header("Add a Blog URL")
-    blog_title= st.sidebar.text_input("Input Blog Title")
-    blog_url= st.sidebar.text_input("Input Blog URL")
-    blog_section = st.sidebar.selectbox("Select a section",list(blog_dict.keys()))
+    blog_title = st.sidebar.text_input("Input Blog Title")
+    blog_url = st.sidebar.text_input("Input Blog URL")
+    blog_section = st.sidebar.selectbox("Select a section", list(blog_dict.keys()))
 
     if st.sidebar.button("Save"):
         blog_dict.setdefault(blog_section, {})[blog_title] = blog_url
         st.sidebar.success("Saved")
         save_to_json()
 
+
 def delete_blog():
-    """Deletes blog url from json file.
-    """
+    """Deletes blog url from json file."""
     st.sidebar.header("Delete Blog")
-    blog_section = st.sidebar.selectbox("Select a section for the blog URL to delete", list(blog_dict.keys()))
-    blog_title = st.sidebar.selectbox("Select the blog URL to delete", list(blog_dict[blog_section].keys()))
+    blog_section = st.sidebar.selectbox(
+        "Select a section for the blog URL to delete", list(blog_dict.keys())
+    )
+    blog_title = st.sidebar.selectbox(
+        "Select the blog URL to delete", list(blog_dict[blog_section].keys())
+    )
     if st.sidebar.button("Delete"):
         del blog_dict[blog_section][blog_title]
         st.sidebar.success(f"Deleted")
         save_to_json()
+
+
 def add_section():
-    """Creates New section.
-    """
+    """Creates New section."""
     st.sidebar.header("Create a New Section")
     new_section = st.sidebar.text_input("Enter a name for the new section")
     if st.sidebar.button("Create"):
@@ -77,12 +87,12 @@ def add_section():
             st.sidebar.success(f"Created '{new_section}' section")
             save_to_json()
 
+
 def remove_section():
-    """Deletes section from json.
-    """
+    """Deletes section from json."""
     st.sidebar.header("Delete Section")
     blog_section = st.sidebar.selectbox("Select section", list(blog_dict.keys()))
-    delete_section=st.sidebar.button("Delete Section")
+    delete_section = st.sidebar.button("Delete Section")
     confirm_delete = st.sidebar.checkbox("Confirm deletion of selected section")
     if confirm_delete and delete_section:
         del blog_dict[blog_section]
@@ -90,6 +100,7 @@ def remove_section():
         save_to_json()
     elif delete_section:
         st.sidebar.warning("Please confirm deletion")
+
 
 def search():
     """Searches for content on json file.
@@ -106,11 +117,15 @@ def search():
                 results.append(f"- [{url_name}]({url_link})")
         else:
             for url_name, url_link in urls.items():
-                if search_term.lower() in url_name.lower() or search_term.lower() in url_link.lower():
+                if (
+                    search_term.lower() in url_name.lower()
+                    or search_term.lower() in url_link.lower()
+                ):
                     results.append(f"- {section}: [{url_name}]({url_link})")
     return results
 
-def edit_section_position(blog_dict,section_name, new_position):
+
+def edit_section_position(blog_dict, section_name, new_position):
     """Edits the position of a section in the JSON file.
 
     Args:
@@ -120,7 +135,9 @@ def edit_section_position(blog_dict,section_name, new_position):
 
     num_sections = len(blog_dict)
     if not (0 <= new_position < num_sections):
-        st.sidebar.warning(f"Invalid position: {new_position}. The number of sections is {num_sections}")
+        st.sidebar.warning(
+            f"Invalid position: {new_position}. The number of sections is {num_sections}"
+        )
     sections = list(blog_dict.keys())
     current_position = sections.index(section_name)
     sections.pop(current_position)
@@ -133,13 +150,14 @@ def edit_section_position(blog_dict,section_name, new_position):
 
 def main():
     st.set_page_config(
-    page_title="Saved Blog Manager",
-    page_icon="📖",
-    initial_sidebar_state="expanded",
-    menu_items={
-        'Report a bug': "https://github.com/Samir84753/Streamlit-Webapp/issues",
-        'About': "This is a web application made with Streamlit."
-    })
+        page_title="Saved Blog Manager",
+        page_icon="📖",
+        initial_sidebar_state="expanded",
+        menu_items={
+            "Report a bug": "https://github.com/Samir84753/Streamlit-Webapp/issues",
+            "About": "This is a web application made with Streamlit.",
+        },
+    )
 
     st.title("# Saved Blog Manager")
 
@@ -148,19 +166,27 @@ def main():
         add_section()
         delete_blog()
         remove_section()
-        section_name = st.sidebar.selectbox("Select section to move", list(blog_dict.keys()))
-        new_position = st.sidebar.number_input("Enter new position", value=0, min_value=0, max_value=len(blog_dict)-1)
+        section_name = st.sidebar.selectbox(
+            "Select section to move", list(blog_dict.keys())
+        )
+        new_position = st.sidebar.number_input(
+            "Enter new position", value=0, min_value=0, max_value=len(blog_dict) - 1
+        )
         if st.sidebar.button("Move"):
-            edit_section_position(blog_dict,section_name, new_position)
-           
+            edit_section_position(blog_dict, section_name, new_position)
+
     else:
         st.header("## Authenticate to add urls")
 
-   # download urls as json file
-    if st.sidebar.download_button('Download Blog URLs Json File', json.dumps(blog_dict).encode('utf-8'), "blog_urls.json"):
+    # download urls as json file
+    if st.sidebar.download_button(
+        "Download Blog URLs Json File",
+        json.dumps(blog_dict).encode("utf-8"),
+        "blog_urls.json",
+    ):
         st.sidebar.success("Downloaded successfully as a JSON file!")
 
-    #view section
+    # view section
     results = search()
     if results:
         for result in results:
@@ -171,5 +197,6 @@ def main():
             for url_name, url_link in urls.items():
                 st.write(f"- [{url_name}]({url_link})")
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     main()
