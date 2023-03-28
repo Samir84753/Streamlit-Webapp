@@ -149,17 +149,29 @@ def search():
     return results
 
 
-def main():
-    st.set_page_config(
-        page_title="Saved Blog Manager",
-        page_icon="📖",
-        initial_sidebar_state="expanded",
-        menu_items={
-            "Report a bug": "https://github.com/Samir84753/Streamlit-Webapp/issues",
-            "About": "This is a web application made with Streamlit.",
-        },
-    )
+def edit_section_position(blog_dict, section_name, new_position):
+    """Edits the position of a section in the JSON file.
+    Args:
+        section_name (str): The name of the section to edit.
+        new_position (int): The new position of the section.
+    """
 
+    num_sections = len(blog_dict)
+    if not (0 <= new_position < num_sections):
+        st.sidebar.warning(
+            f"Invalid position: {new_position}. The number of sections is {num_sections}"
+        )
+    sections = list(blog_dict.keys())
+    current_position = sections.index(section_name)
+    sections.pop(current_position)
+    sections.insert(new_position, section_name)
+    blog_dict = {section: blog_dict[section] for section in sections}
+    with open(json_file, "w") as f:
+        json.dump(blog_dict, f)
+    st.sidebar.success(f"Moved '{section_name}' section to position {new_position}")
+
+
+def main():
     st.title("# Saved Blog Manager")
 
     if user_auth():
