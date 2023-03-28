@@ -1,0 +1,11 @@
+credentials:
+  usernames:
+    samir:
+      email: samir84753@gmail.com
+      name: Samir Maharjan
+      password: $2b$12$.xmZUMrDJrHbx.gBLzGl2.9oiLlOq5HfLPlQJhnm2FXokl7QP1jsi 
+
+cookie:
+  expiry_days: 7
+  # key: some_signature_key 
+  # name: some_cookie_name

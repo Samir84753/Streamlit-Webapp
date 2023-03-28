@@ -1,13 +1,25 @@
 import streamlit as st
 import json
-from dotenv import load_dotenv
 import os
+import streamlit_authenticator as stauth
+import yaml
+from yaml.loader import SafeLoader
+
+from dotenv import load_dotenv
 
 load_dotenv()
 
 
 # Define the filename for the JSON file
 json_file = "blog_urls.json"
+
+
+def download_json_file():
+    with open(json_file, "r") as f:
+        data = json.load(f)
+    with open("downloaded.json", "w") as f:
+        json.dump(data, f)
+    st.sidebar.success(f"{json_file} downloaded successfully as a JSON file!")
 
 
 # Load the blog URLs from the JSON file
@@ -18,9 +30,21 @@ try:
 except FileNotFoundError:
     blog_dict = {}
 
-# Define the password
+# Define the .env variables
 
 password = os.environ.get("PASSWORD")
+cookie_key = os.environ.get("COOKIE_KEY")
+cookie_name = os.environ.get("COOKIE_NAME")
+
+# login widget
+with open("config.yaml") as file:
+    config = yaml.safe_load(file)
+authenticator = stauth.Authenticate(
+    config["credentials"],
+    cookie_name,
+    cookie_key,
+    config["cookie"]["expiry_days"],
+)
 
 
 # Define a function to check the user's password
@@ -30,14 +54,18 @@ def user_auth():
     Returns:
         bool: True if password matches. Else False.
     """
-    user_password = st.sidebar.text_input(
-        "Enter the password to add or delete blog URLs", type="password"
-    )
-    if user_password == password:
+    authenticator.login("Login", "sidebar")
+    if "key" not in st.session_state:
+        st.session_state.setdefault("key", cookie_key)
+
+    if st.session_state["authentication_status"]:
+        st.write(f'Welcome *{st.session_state["name"]}*')
+        authenticator.logout("Logout", "sidebar")
         return True
-    elif user_password != "":
-        st.sidebar.warning("Incorrect password")
-    return False
+    elif st.session_state["authentication_status"] == False:
+        st.error("Username/password is incorrect")
+    elif st.session_state["authentication_status"] == None:
+        st.warning("Please enter your username and password")
 
 
 # Define a function to save the blog URLs to the JSON file
@@ -91,15 +119,11 @@ def add_section():
 def remove_section():
     """Deletes section from json."""
     st.sidebar.header("Delete Section")
-    blog_section = st.sidebar.selectbox("Select section", list(blog_dict.keys()))
-    delete_section = st.sidebar.button("Delete Section")
-    confirm_delete = st.sidebar.checkbox("Confirm deletion of selected section")
-    if confirm_delete and delete_section:
+    blog_section = st.sidebar.selectbox("select section", list(blog_dict.keys()))
+    if st.sidebar.button("Delete Section"):
         del blog_dict[blog_section]
         st.sidebar.success(f"{blog_section} section deleted")
         save_to_json()
-    elif delete_section:
-        st.sidebar.warning("Please confirm deletion")
 
 
 def search():
@@ -123,29 +147,6 @@ def search():
                 ):
                     results.append(f"- {section}: [{url_name}]({url_link})")
     return results
-
-
-def edit_section_position(blog_dict, section_name, new_position):
-    """Edits the position of a section in the JSON file.
-
-    Args:
-        section_name (str): The name of the section to edit.
-        new_position (int): The new position of the section.
-    """
-
-    num_sections = len(blog_dict)
-    if not (0 <= new_position < num_sections):
-        st.sidebar.warning(
-            f"Invalid position: {new_position}. The number of sections is {num_sections}"
-        )
-    sections = list(blog_dict.keys())
-    current_position = sections.index(section_name)
-    sections.pop(current_position)
-    sections.insert(new_position, section_name)
-    blog_dict = {section: blog_dict[section] for section in sections}
-    with open(json_file, "w") as f:
-        json.dump(blog_dict, f)
-    st.sidebar.success(f"Moved '{section_name}' section to position {new_position}")
 
 
 def main():
@@ -177,15 +178,8 @@ def main():
 
     else:
         st.header("## Authenticate to add urls")
-
-    # download urls as json file
-    if st.sidebar.download_button(
-        "Download Blog URLs Json File",
-        json.dumps(blog_dict).encode("utf-8"),
-        "blog_urls.json",
-    ):
-        st.sidebar.success("Downloaded successfully as a JSON file!")
-
+    if st.sidebar.button("Download JSON file"):
+        download_json_file()
     # view section
     results = search()
     if results:

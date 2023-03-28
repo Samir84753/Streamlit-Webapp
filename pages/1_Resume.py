@@ -1,27 +1,19 @@
 import streamlit as st
 
-def main():
-    st.write("# Welcome to Streamlit! 👋")
+# load html and pdf file.
+with open("assets/Samir_resume.html", "r") as f:
+    html_string = f.read()
+pdf_path = "assets/Samir_resume.pdf"
+with open(pdf_path, "rb") as f:
+    pdf_bytes = f.read()
 
-    st.sidebar.success("Select a demo above.")
+# html display
+st.components.v1.html(html_string, width=950, height=1210)
 
-    st.markdown(
-        """
-        Streamlit is an open-source app framework built specifically for
-        Machine Learning and Data Science projects.
-        **👈 Select a demo from the sidebar** to see some examples
-        of what Streamlit can do!
-        ### Want to learn more?
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into our [documentation](https://docs.streamlit.io)
-        - Ask a question in our [community
-            forums](https://discuss.streamlit.io)
-        ### See more complex demos
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-            Dataset](https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
-    """
-    )
-
-if __name__=="__main__":
-    main()
+# download button for resume on sidebar.
+st.sidebar.download_button(
+    "Download Resume",
+    data=pdf_bytes,
+    file_name="Samir_resume.pdf",
+    mime="application/pdf",
+)
